@@ -408,42 +408,51 @@ function generateWeeklyReport(transactions, from, to, chartContainer, reportDeta
     // Create chart
     const canvas = document.createElement('canvas');
     chartContainer.appendChild(canvas);
-    
-    new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Income',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                    data: incomeData
+    try{
+        if (typeof Chart !== 'undefined') { 
+            new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            data: incomeData
+                        },
+                        {
+                            label: 'Expenses',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            data: expenseData
+                        }
+                    ]
                 },
-                {
-                    label: 'Expenses',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                    data: expenseData
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Amount ($)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            }
+                        }
                     }
                 }
-            }
+            });
+        } else {
+            chartContainer.innerHTML = '<p>Chart library not loaded. Please refresh the page.</p>';
         }
-    });
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        chartContainer.innerHTML = '<p>Error creating chart. Please try again later.</p>';
+    }
+
     
     // Create details section
     reportDetails.innerHTML = '<h4>Weekly Breakdown</h4>';
