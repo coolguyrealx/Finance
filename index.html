@@ -3,13 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Web Page</title>
+    <title>FinanceTracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #34495e;
+            padding: 0.5rem;
+        }
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav li {
+            margin: 0 1rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        .expense-form {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Basic Web Page</h1>
-    <p>This is a simple web page with a JavaScript alert.</p>
+    <header>
+        <h1>FinanceTracker</h1>
+        <p>Your personal finance management solution</p>
+    </header>
     
-    <!-- Link to the JavaScript file -->
+    <nav>
+        <ul>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#expenses">Expenses</a></li>
+            <li><a href="#budget">Budget</a></li>
+            <li><a href="#reports">Reports</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <section id="dashboard">
+            <h2>Financial Dashboard</h2>
+            <div class="dashboard">
+                <div class="card" id="total-balance">
+                    <h3>Total Balance</h3>
+                    <p class="amount">$<span id="balance-amount">0.00</span></p>
+                </div>
+                <div class="card" id="income">
+                    <h3>Income</h3>
+                    <p class="amount">$<span id="income-amount">0.00</span></p>
+                </div>
+                <div class="card" id="expenses">
+                    <h3>Expenses</h3>
+                    <p class="amount">$<span id="expenses-amount">0.00</span></p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="add-transaction">
+            <h2>Add New Transaction</h2>
+            <div class="expense-form">
+                <div class="form-group">
+                    <label for="transaction-type">Type</label>
+                    <select id="transaction-type">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-name">Description</label>
+                    <input type="text" id="transaction-name" placeholder="e.g., Salary, Groceries">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-amount">Amount ($)</label>
+                    <input type="number" id="transaction-amount" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-date">Date</label>
+                    <input type="date" id="transaction-date">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-category">Category</label>
+                    <select id="transaction-category">
+                        <option value="salary">Salary</option>
+                        <option value="food">Food</option>
+                        <option value="housing">Housing</option>
+                        <option value="transportation">Transportation</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button id="add-transaction-btn">Add Transaction</button>
+            </div>
+        </section>
+        
+        <section id="transaction-history">
+            <h2>Recent Transactions</h2>
+            <div class="card">
+                <table id="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-body">
+                        <!-- Transactions will be added here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 FinanceTracker. All rights reserved.</p>
+    </footer>
+    
     <script src="script.js"></script>
 </body>
 </html>
