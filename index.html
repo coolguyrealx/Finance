@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Finance Tracker</title>
+    <title>FinanceTracker</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -109,7 +109,7 @@
 </head>
 <body>
     <header>
-        <h1>Student Finance Tracker</h1>
+        <h1>FinanceTracker</h1>
         <p>Your personal finance management solution</p>
     </header>
     
@@ -190,6 +190,7 @@
                             <th>Category</th>
                             <th>Type</th>
                             <th>Amount</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="transactions-body">
@@ -200,8 +201,125 @@
         </section>
     </div>
     
+    <!-- Add this modal for editing transactions below the main container div -->
+    <div id="edit-modal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+            <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h3>Edit Transaction</h3>
+            <div class="form-group">
+                <label for="edit-transaction-type">Type</label>
+                <select id="edit-transaction-type">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-transaction-name">Description</label>
+                <input type="text" id="edit-transaction-name">
+            </div>
+            <div class="form-group">
+                <label for="edit-transaction-amount">Amount ($)</label>
+                <input type="number" id="edit-transaction-amount" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="edit-transaction-date">Date</label>
+                <input type="date" id="edit-transaction-date">
+            </div>
+            <div class="form-group">
+                <label for="edit-transaction-category">Category</label>
+                <select id="edit-transaction-category">
+                    <option value="salary">Salary</option>
+                    <option value="food">Food</option>
+                    <option value="housing">Housing</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="utilities">Utilities</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <input type="hidden" id="edit-transaction-id">
+            <button id="update-transaction-btn">Update Transaction</button>
+        </div>
+    </div>
+
+    <!-- Add these sections inside the container div, before the footer -->
+    <section id="search-filter" style="margin-bottom: 20px;">
+        <h2>Search & Filter Transactions</h2>
+        <div class="card">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                    <label for="search-term">Search</label>
+                    <input type="text" id="search-term" placeholder="Search description...">
+                </div>
+                <div class="form-group">
+                    <label for="filter-category">Category</label>
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                        <option value="salary">Salary</option>
+                        <option value="food">Food</option>
+                        <option value="housing">Housing</option>
+                        <option value="transportation">Transportation</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filter-type">Type</label>
+                    <select id="filter-type">
+                        <option value="">All Types</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filter-date-from">From Date</label>
+                    <input type="date" id="filter-date-from">
+                </div>
+                <div class="form-group">
+                    <label for="filter-date-to">To Date</label>
+                    <input type="date" id="filter-date-to">
+                </div>
+            </div>
+            <button id="apply-filters-btn" style="margin-top: 10px;">Apply Filters</button>
+            <button id="reset-filters-btn" style="margin-top: 10px; margin-left: 10px;">Reset Filters</button>
+        </div>
+    </section>
+
+    <section id="reports">
+        <h2>Financial Reports</h2>
+        <div class="card">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label for="report-type">Report Type</label>
+                    <select id="report-type">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="category">By Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="report-date-from">From Date</label>
+                    <input type="date" id="report-date-from">
+                </div>
+                <div class="form-group">
+                    <label for="report-date-to">To Date</label>
+                    <input type="date" id="report-date-to">
+                </div>
+            </div>
+            <button id="generate-report-btn">Generate Report</button>
+            
+            <div id="report-results" style="margin-top: 20px; display: none;">
+                <h3 id="report-title">Report Results</h3>
+                <div id="chart-container" style="height: 300px; margin-bottom: 20px;"></div>
+                <div id="report-summary"></div>
+                <div id="report-details"></div>
+            </div>
+        </div>
+    </section>
+    
     <footer>
-        <p>&copy; 2023 Student Finance Tracker. All rights reserved.</p>
+        <p>&copy; 2023 FinanceTracker. All rights reserved.</p>
     </footer>
     
     <script src="script.js"></script>
