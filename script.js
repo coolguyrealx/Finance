@@ -17,6 +17,33 @@ let currentFilters = {
     dateTo: ''
 };
 
+// Theme management
+function initTheme() {
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeToggleIcon(savedTheme);
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Set the theme
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // Update the toggle icon
+    updateThemeToggleIcon(newTheme);
+}
+
+function updateThemeToggleIcon(theme) {
+    const toggleButton = document.getElementById('theme-toggle');
+    toggleButton.innerHTML = theme === 'dark' ? '🌙' : '☀️';
+}
+
 // Load data from localStorage if available
 function loadData() {
     const savedData = localStorage.getItem('financeData');
