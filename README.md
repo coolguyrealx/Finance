@@ -1,5 +1,3 @@
-Student Financing Website
-
 Our website has an appropriate use of comments, naming conventions, and proper formatting.
 
 Our program is modular in a way that makes logical, readable sense.
