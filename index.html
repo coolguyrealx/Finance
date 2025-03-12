@@ -352,8 +352,35 @@
     
     <footer>
         <p>&copy; 2023 Student Finance Tracker. All rights reserved.</p>
+        <p><a href="#" id="report-issue-link" style="color: white; text-decoration: underline;">Report an Issue</a></p>
     </footer>
     
+    <!-- Add this modal for reporting issues after the edit-modal div -->
+    <div id="issue-modal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: var(--card-background); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+            <span class="close-issue-modal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h3>Report an Issue</h3>
+            <div class="form-group">
+                <label for="issue-type">Issue Type</label>
+                <select id="issue-type">
+                    <option value="bug">Bug Report</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="question">Question</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="issue-description">Description</label>
+                <textarea id="issue-description" rows="5" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--card-background); color: var(--text-color);"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="issue-email">Your Email (optional)</label>
+                <input type="email" id="issue-email" placeholder="email@example.com">
+            </div>
+            <button id="submit-issue-btn">Submit Issue</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

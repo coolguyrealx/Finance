@@ -811,3 +811,74 @@ document.addEventListener('DOMContentLoaded', function() {
         themeToggle.innerHTML = theme === 'light' ? '🌕' : '☀️';
     }
 });
+
+// Show issue modal
+function openIssueModal() {
+    document.getElementById('issue-modal').style.display = 'block';
+}
+
+// Close issue modal
+function closeIssueModal() {
+    document.getElementById('issue-modal').style.display = 'none';
+    
+    // Clear form
+    document.getElementById('issue-type').value = 'bug';
+    document.getElementById('issue-description').value = '';
+    document.getElementById('issue-email').value = '';
+}
+
+// Submit issue
+function submitIssue() {
+    const issueType = document.getElementById('issue-type').value;
+    const description = document.getElementById('issue-description').value;
+    const email = document.getElementById('issue-email').value;
+    
+    // Validate input
+    if (!description) {
+        alert('Please provide a description of the issue');
+        return;
+    }
+    
+    // Here you would typically send this data to your server
+    // For this example, we'll just show a success message
+    alert('Thank you for your feedback! Your issue has been reported.');
+    
+    // Store in localStorage for demo purposes
+    const issues = JSON.parse(localStorage.getItem('reportedIssues') || '[]');
+    issues.push({
+        type: issueType,
+        description: description,
+        email: email,
+        date: new Date().toISOString(),
+        status: 'pending'
+    });
+    localStorage.setItem('reportedIssues', JSON.stringify(issues));
+    
+    // Close the modal
+    closeIssueModal();
+}
+
+// Add these event listeners inside the window.onload function
+window.addEventListener('DOMContentLoaded', function() {
+    // Existing code...
+    
+    // Report issue link
+    document.getElementById('report-issue-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        openIssueModal();
+    });
+    
+    // Close issue modal button
+    document.querySelector('.close-issue-modal').addEventListener('click', closeIssueModal);
+    
+    // Submit issue button
+    document.getElementById('submit-issue-btn').addEventListener('click', submitIssue);
+    
+    // When clicking outside the issue modal, close it
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('issue-modal');
+        if (event.target === modal) {
+            closeIssueModal();
+        }
+    });
+});
