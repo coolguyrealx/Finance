@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Finance Tracker</title>
     <style>
+        /* Theme variables for light mode */
         :root {
-             /* Light theme variables */
+            /* Light theme variables */
             --background-color: #f5f5f5;
             --text-color: #333;
             --card-background: #ffffff;
@@ -21,7 +23,8 @@
             --expense-color: #e74c3c;
         }
 
-        [data-theme="dark"]{
+        /* Theme variables for dark mode */
+        [data-theme="dark"] {
             /* Dark theme variables */
             --background-color: #1a1a1a;
             --text-color: #f0f0f0;
@@ -36,6 +39,8 @@
             --income-color: #2ecc71;
             --expense-color: #e74c3c;
         }
+
+        /* Base body styling with theme colors and transitions */
         body {
             font-family: 'Arial', sans-serif;
             line-height: 1.6;
@@ -45,6 +50,8 @@
             background-color: var(--background-color);
             transition: background-color 0.3s, color 0.3s;
         }
+
+        /* Header styling with flex layout */
         header {
             background-color: var(--header-background);
             color: var(--header-text);
@@ -54,10 +61,14 @@
             justify-content: space-between;
             align-items: center;
         }
-        header .title-container{
+
+        /* Center the title within the header */
+        header .title-container {
             flex-grow: 1;
             text-align: center
         }
+
+        /* Theme toggle button styling */
         .theme-toggle {
             background-color: transparent;
             border: 2px solid var(--header-text);
@@ -72,13 +83,19 @@
             font-size: 1.2rem;
             transition: background-color 0.3s;
         }
+
+        /* Hover effect for theme toggle button */
         .theme-toggle:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
+        /* Navigation bar styling */
         nav {
             background-color: var(--nav-background);
             padding: 0.5rem;
         }
+
+        /* Navigation menu list styling */
         nav ul {
             list-style-type: none;
             margin: 0;
@@ -86,46 +103,65 @@
             display: flex;
             justify-content: center;
         }
+
+        /* Navigation list item spacing */
         nav li {
             margin: 0 1rem;
         }
+
+        /* Navigation link styling */
         nav a {
             color: var(--header-text);
             text-decoration: none;
         }
+
+        /* Main content container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 1rem;
         }
+
+        /* Dashboard grid layout */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
+
+        /* Card component styling */
         .card {
             background-color: var(--card-background);
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
         }
+
+        /* Form container styling */
         .expense-form {
             background-color: var(--card-background);
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
+
+        /* Form field group spacing */
         .form-group {
             margin-bottom: 1rem;
         }
+
+        /* Form label styling */
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
         }
-         input, select {
+
+        /* Form input and select field styling */
+        input,
+        select {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid var(--border-color);
@@ -133,6 +169,8 @@
             background-color: var(--card-background);
             color: var(--text-color);
         }
+
+        /* Button styling */
         button {
             background-color: var(--button-background);
             color: white;
@@ -141,21 +179,32 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        /* Button hover effect */
         button:hover {
             background-color: var(--button-hover);
         }
+
+        /* Table styling for transaction history */
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        th, td {
+
+        /* Table cell styling */
+        th,
+        td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
+        /* Table header styling */
         th {
             background-color: #f2f2f2;
         }
+
+        /* Footer styling */
         footer {
             background-color: #2c3e50;
             color: white;
@@ -163,19 +212,27 @@
             padding: 1rem;
             margin-top: 2rem;
         }
+
+        /* Income amount text color */
         .income {
             color: var(--income-color);
         }
+
+        /* Expense amount text color */
         .expense {
             color: var(--expense-color);
         }
+
+        /* Dialog/popup content styling */
         .modal-content {
             background-color: var(--card-background);
             color: var(--text-color);
         }
     </style>
 </head>
+
 <body>
+    <!-- Main header section with title and theme toggle -->
     <header>
         <div class="title-container">
             <h1>Student Finance Tracker</h1>
@@ -185,7 +242,8 @@
             ☀️/🌕
         </button>
     </header>
-    
+
+    <!-- Navigation menu -->
     <nav>
         <ul>
             <li><a href="#dashboard">Dashboard</a></li>
@@ -193,29 +251,36 @@
             <li><a href="#reports">Reports</a></li>
         </ul>
     </nav>
-    
+
+    <!-- Main content container -->
     <div class="container">
+        <!-- Financial dashboard section with summary cards -->
         <section id="dashboard">
             <h2>Financial Dashboard</h2>
             <div class="dashboard">
+                <!-- Total balance card -->
                 <div class="card" id="total-balance">
                     <h3>Total Balance</h3>
                     <p class="amount">$<span id="balance-amount">0.00</span></p>
                 </div>
+                <!-- Income summary card -->
                 <div class="card" id="income">
                     <h3>Income</h3>
                     <p class="amount">$<span id="income-amount">0.00</span></p>
                 </div>
+                <!-- Expenses summary card -->
                 <div class="card" id="expenses">
                     <h3>Expenses</h3>
                     <p class="amount">$<span id="expenses-amount">0.00</span></p>
                 </div>
             </div>
         </section>
-        
+
+        <!-- Transaction entry form section -->
         <section id="add-transaction">
             <h2>Add New Transaction</h2>
             <div class="expense-form">
+                <!-- Transaction type selection -->
                 <div class="form-group">
                     <label for="transaction-type">Type</label>
                     <select id="transaction-type">
@@ -223,18 +288,22 @@
                         <option value="expense">Expense</option>
                     </select>
                 </div>
+                <!-- Transaction description input -->
                 <div class="form-group">
                     <label for="transaction-name">Description</label>
                     <input type="text" id="transaction-name" placeholder="e.g., Salary, Groceries">
                 </div>
+                <!-- Transaction amount input -->
                 <div class="form-group">
                     <label for="transaction-amount">Amount ($)</label>
                     <input type="number" id="transaction-amount" min="0" step="0.01" placeholder="0.00">
                 </div>
+                <!-- Transaction date input -->
                 <div class="form-group">
                     <label for="transaction-date">Date</label>
                     <input type="date" id="transaction-date">
                 </div>
+                <!-- Transaction category selection -->
                 <div class="form-group">
                     <label for="transaction-category">Category</label>
                     <select id="transaction-category">
@@ -247,10 +316,12 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
+                <!-- Submit transaction button -->
                 <button id="add-transaction-btn">Add Transaction</button>
             </div>
         </section>
-        
+
+        <!-- Transaction history section with table -->
         <section id="transaction-history">
             <h2>Recent Transactions</h2>
             <div class="card">
@@ -272,12 +343,17 @@
             </div>
         </section>
     </div>
-    
-    <!-- Add this modal for editing transactions below the main container div -->
-    <div id="edit-modal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div class="modal-content" style="background-color: var(--card-background); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
-            <span class="close" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+
+    <!-- Edit transaction popup/dialog overlay -->
+    <div id="edit-modal" class="modal"
+        style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content"
+            style="background-color: var(--card-background); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+            <!-- Close button for edit dialog -->
+            <span class="close"
+                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
             <h3>Edit Transaction</h3>
+            <!-- Edit transaction type field -->
             <div class="form-group">
                 <label for="edit-transaction-type">Type</label>
                 <select id="edit-transaction-type">
@@ -285,18 +361,22 @@
                     <option value="expense">Expense</option>
                 </select>
             </div>
+            <!-- Edit transaction description field -->
             <div class="form-group">
                 <label for="edit-transaction-name">Description</label>
                 <input type="text" id="edit-transaction-name">
             </div>
+            <!-- Edit transaction amount field -->
             <div class="form-group">
                 <label for="edit-transaction-amount">Amount ($)</label>
                 <input type="number" id="edit-transaction-amount" min="0" step="0.01">
             </div>
+            <!-- Edit transaction date field -->
             <div class="form-group">
                 <label for="edit-transaction-date">Date</label>
                 <input type="date" id="edit-transaction-date">
             </div>
+            <!-- Edit transaction category field -->
             <div class="form-group">
                 <label for="edit-transaction-category">Category</label>
                 <select id="edit-transaction-category">
@@ -309,18 +389,21 @@
                     <option value="other">Other</option>
                 </select>
             </div>
+            <!-- Hidden field to store transaction ID -->
             <input type="hidden" id="edit-transaction-id">
+            <!-- Update transaction button -->
             <button id="update-transaction-btn">Update Transaction</button>
         </div>
     </div>
 
-    <!-- Add these sections inside the container div, before the footer -->
-    <!-- Section removed: Search & Filter Transactions -->
-
+    <!-- Financial reports section -->
     <section id="reports">
         <h2>Financial Reports</h2>
         <div class="card">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <!-- Report filters and options -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <!-- Report type selection -->
                 <div class="form-group">
                     <label for="report-type">Report Type</label>
                     <select id="report-type">
@@ -329,36 +412,49 @@
                         <option value="category">By Category</option>
                     </select>
                 </div>
+                <!-- Start date for report range -->
                 <div class="form-group">
                     <label for="report-date-from">From Date</label>
                     <input type="date" id="report-date-from">
                 </div>
+                <!-- End date for report range -->
                 <div class="form-group">
                     <label for="report-date-to">To Date</label>
                     <input type="date" id="report-date-to">
                 </div>
             </div>
+            <!-- Generate report button -->
             <button id="generate-report-btn">Generate Report</button>
-            
+
+            <!-- Report results container (hidden by default) -->
             <div id="report-results" style="margin-top: 20px; display: none;">
                 <h3 id="report-title">Report Results</h3>
+                <!-- Chart visualization container -->
                 <div id="chart-container" style="height: 300px; margin-bottom: 20px;"></div>
+                <!-- Report summary section -->
                 <div id="report-summary"></div>
+                <!-- Report details section -->
                 <div id="report-details"></div>
             </div>
         </div>
     </section>
-    
+
+    <!-- Page footer with copyright and issue reporting link -->
     <footer>
         <p>&copy; 2023 Student Finance Tracker. All rights reserved.</p>
         <p><a href="#" id="report-issue-link" style="color: white; text-decoration: underline;">Report an Issue</a></p>
     </footer>
-    
-    <!-- Add this modal for reporting issues after the edit-modal div -->
-    <div id="issue-modal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div class="modal-content" style="background-color: var(--card-background); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
-            <span class="close-issue-modal" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+
+    <!-- Issue reporting popup/dialog overlay -->
+    <div id="issue-modal" class="modal"
+        style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content"
+            style="background-color: var(--card-background); margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+            <!-- Close button for issue reporting dialog -->
+            <span class="close-issue-modal"
+                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
             <h3>Report an Issue</h3>
+            <!-- Issue type selection -->
             <div class="form-group">
                 <label for="issue-type">Issue Type</label>
                 <select id="issue-type">
@@ -368,18 +464,24 @@
                     <option value="other">Other</option>
                 </select>
             </div>
+            <!-- Issue description textarea -->
             <div class="form-group">
                 <label for="issue-description">Description</label>
-                <textarea id="issue-description" rows="5" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--card-background); color: var(--text-color);"></textarea>
+                <textarea id="issue-description" rows="5"
+                    style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--card-background); color: var(--text-color);"></textarea>
             </div>
+            <!-- User email input -->
             <div class="form-group">
                 <label for="issue-email">Your Email (optional)</label>
                 <input type="email" id="issue-email" placeholder="email@example.com">
             </div>
+            <!-- Submit issue button -->
             <button id="submit-issue-btn">Submit Issue</button>
         </div>
     </div>
 
+    <!-- JavaScript file reference for functionality -->
     <script src="script.js"></script>
 </body>
+
 </html>
