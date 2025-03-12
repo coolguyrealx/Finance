@@ -68,13 +68,17 @@ function updateDashboard() {
 
 // Add a new transaction
 function addTransaction(type, name, amount, date, category) {
+    // Ensure date string is properly formatted with no timezone issues
+    const fixedDate = new Date(date + 'T00:00:00');
+    const isoDateString = fixedDate.toISOString().split('T')[0];
+    
     // Create transaction object
     const transaction = {
         id: Date.now(),
         type: type,
         name: name,
         amount: parseFloat(amount),
-        date: date,
+        date: isoDateString, // Store date as YYYY-MM-DD string with no timezone issues
         category: category
     };
     
@@ -223,8 +227,12 @@ function renderTransactions() {
     transactionsToShow.forEach(transaction => {
         const row = document.createElement('tr');
         
-        // Format date
-        const dateObj = new Date(transaction.date);
+        // Format date without timezone issues
+        const dateStr = transaction.date; // Already in YYYY-MM-DD format
+        const dateParts = dateStr.split('-');
+        // Create date object with explicit year, month, day values to avoid timezone issues
+        // Note: month in JS Date is 0-indexed, so we subtract 1 from the month
+        const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
         const formattedDate = dateObj.toLocaleDateString();
         
         row.innerHTML = `
@@ -282,7 +290,23 @@ function closeEditModal() {
     document.getElementById('edit-modal').style.display = 'none';
 }
 
-// Generate a report
+// Add this function to ensure Chart.js is loaded
+function loadChartJs() {
+    return new Promise((resolve, reject) => {
+        if (typeof Chart !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        const chartScript = document.createElement('script');
+        chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        chartScript.onload = resolve;
+        chartScript.onerror = reject;
+        document.head.appendChild(chartScript);
+    });
+}
+
+// Then update generateReport to use this
 function generateReport() {
     const reportType = document.getElementById('report-type').value;
     const fromDate = document.getElementById('report-date-from').value;
@@ -302,61 +326,74 @@ function generateReport() {
         return;
     }
     
-    // Filter transactions for the selected date range
-    const filteredTransactions = financeData.transactions.filter(t => {
-        const date = new Date(t.date);
-        return date >= from && date <= to;
-    });
-    
-    if (filteredTransactions.length === 0) {
-        alert('No transactions found in the selected date range');
-        return;
-    }
-    
+    // Show loading indicator
     const reportResults = document.getElementById('report-results');
-    const reportTitle = document.getElementById('report-title');
-    const reportSummary = document.getElementById('report-summary');
-    const reportDetails = document.getElementById('report-details');
-    const chartContainer = document.getElementById('chart-container');
-    
     reportResults.style.display = 'block';
-    chartContainer.innerHTML = '';
-    
-    let totalIncome = 0;
-    let totalExpenses = 0;
-    
-    filteredTransactions.forEach(t => {
-        if (t.type === 'income') {
-            totalIncome += t.amount;
-        } else {
-            totalExpenses += t.amount;
-        }
-    });
-    
-    const netChange = totalIncome - totalExpenses;
-    
-    // Set report title
-    reportTitle.textContent = `Financial Report: ${from.toLocaleDateString()} to ${to.toLocaleDateString()}`;
-    
-    // Create summary section
-    reportSummary.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <h4>Summary</h4>
-            <p>Total Income: $${totalIncome.toFixed(2)}</p>
-            <p>Total Expenses: $${totalExpenses.toFixed(2)}</p>
-            <p>Net Change: $${netChange.toFixed(2)}</p>
-            <p>Number of Transactions: ${filteredTransactions.length}</p>
-        </div>
-    `;
-    
-    // Generate different reports based on type
-    if (reportType === 'weekly') {
-        generateWeeklyReport(filteredTransactions, from, to, chartContainer, reportDetails);
-    } else if (reportType === 'monthly') {
-        generateMonthlyReport(filteredTransactions, from, to, chartContainer, reportDetails);
-    } else if (reportType === 'category') {
-        generateCategoryReport(filteredTransactions, chartContainer, reportDetails);
-    }
+    const chartContainer = document.getElementById('chart-container');
+    chartContainer.innerHTML = '<p>Loading report...</p>';
+
+    // First load Chart.js if needed, then generate the report
+    loadChartJs()
+        .then(() => {
+            // Continue with report generation
+            // Filter transactions for the selected date range
+            const filteredTransactions = financeData.transactions.filter(t => {
+                const date = new Date(t.date);
+                return date >= from && date <= to;
+            });
+            
+            if (filteredTransactions.length === 0) {
+                alert('No transactions found in the selected date range');
+                reportResults.style.display = 'none';
+                return;
+            }
+            
+            const reportTitle = document.getElementById('report-title');
+            const reportSummary = document.getElementById('report-summary');
+            const reportDetails = document.getElementById('report-details');
+            
+            chartContainer.innerHTML = '';
+            
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            
+            filteredTransactions.forEach(t => {
+                if (t.type === 'income') {
+                    totalIncome += t.amount;
+                } else {
+                    totalExpenses += t.amount;
+                }
+            });
+            
+            const netChange = totalIncome - totalExpenses;
+            
+            // Set report title
+            reportTitle.textContent = `Financial Report: ${from.toLocaleDateString()} to ${to.toLocaleDateString()}`;
+            
+            // Create summary section
+            reportSummary.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4>Summary</h4>
+                    <p>Total Income: $${totalIncome.toFixed(2)}</p>
+                    <p>Total Expenses: $${totalExpenses.toFixed(2)}</p>
+                    <p>Net Change: $${netChange.toFixed(2)}</p>
+                    <p>Number of Transactions: ${filteredTransactions.length}</p>
+                </div>
+            `;
+            
+            // Generate different reports based on type
+            if (reportType === 'weekly') {
+                generateWeeklyReport(filteredTransactions, from, to, chartContainer, reportDetails);
+            } else if (reportType === 'monthly') {
+                generateMonthlyReport(filteredTransactions, from, to, chartContainer, reportDetails);
+            } else if (reportType === 'category') {
+                generateCategoryReport(filteredTransactions, chartContainer, reportDetails);
+            }
+        })
+        .catch(error => {
+            console.error('Failed to load Chart.js:', error);
+            chartContainer.innerHTML = '<p>Failed to load chart library. Please check your internet connection and try again.</p>';
+        });
 }
 
 // Generate a weekly report
@@ -405,54 +442,29 @@ function generateWeeklyReport(transactions, from, to, chartContainer, reportDeta
         expenseData.push(weeks[week].expenses);
     });
     
-    // Create chart
+    // Create chart with better error handling
     const canvas = document.createElement('canvas');
     chartContainer.appendChild(canvas);
-    try{
-        if (typeof Chart !== 'undefined') { 
-            new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Income',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1,
-                            data: incomeData
-                        },
-                        {
-                            label: 'Expenses',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1,
-                            data: expenseData
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Amount ($)'
-                            }
-                        }
-                    }
-                }
-            });
-        } else {
-            chartContainer.innerHTML = '<p>Chart library not loaded. Please refresh the page.</p>';
-        }
-    } catch (error) {
-        console.error('Error creating chart:', error);
-        chartContainer.innerHTML = '<p>Error creating chart. Please try again later.</p>';
+    
+    // Check if Chart is available
+    if (typeof Chart === 'undefined') {
+        chartContainer.innerHTML = '<p>Chart library not loaded. Loading now...</p>';
+        
+        // Try to load Chart.js dynamically
+        const chartScript = document.createElement('script');
+        chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        chartScript.onload = function() {
+            // Retry chart creation after library loads
+            createWeeklyChart(canvas, labels, incomeData, expenseData);
+        };
+        chartScript.onerror = function() {
+            chartContainer.innerHTML = '<p>Could not load chart library. Please check your internet connection.</p>';
+        };
+        document.head.appendChild(chartScript);
+    } else {
+        // Chart.js is already available
+        createWeeklyChart(canvas, labels, incomeData, expenseData);
     }
-
     
     // Create details section
     reportDetails.innerHTML = '<h4>Weekly Breakdown</h4>';
@@ -476,6 +488,51 @@ function generateWeeklyReport(transactions, from, to, chartContainer, reportDeta
         
         reportDetails.appendChild(weekDetails);
     });
+}
+
+// Helper function to create weekly chart
+function createWeeklyChart(canvas, labels, incomeData, expenseData) {
+    try {
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        data: incomeData
+                    },
+                    {
+                        label: 'Expenses',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        data: expenseData
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Amount ($)'
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        const chartContainer = canvas.parentNode;
+        chartContainer.innerHTML = '<p>Error creating chart. Please try again later.</p>';
+    }
 }
 
 // Generate a monthly report
@@ -668,12 +725,10 @@ function generateCategoryReport(transactions, chartContainer, reportDetails) {
     });
 }
 
-// Event listeners
-window.onload = function() {
-    // Add Chart.js library
-    const chartScript = document.createElement('script');
-    chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-    document.head.appendChild(chartScript);
+// Event listeners - Consolidated initialization
+window.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme
+    initTheme();
     
     // Load saved data
     loadData();
@@ -681,15 +736,13 @@ window.onload = function() {
     // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('transaction-date').value = today;
-    document.getElementById('filter-date-to').value = today;
-    document.getElementById('report-date-to').value = today;
     
-    // Set default from dates to 30 days ago
+    // Set default report dates
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
-    document.getElementById('filter-date-from').value = thirtyDaysAgoStr;
     document.getElementById('report-date-from').value = thirtyDaysAgoStr;
+    document.getElementById('report-date-to').value = today;
     
     // Add transaction button
     document.getElementById('add-transaction-btn').addEventListener('click', function() {
@@ -738,78 +791,37 @@ window.onload = function() {
     // Close modal button
     document.querySelector('.close').addEventListener('click', closeEditModal);
     
-    // Apply filters button
-    document.getElementById('apply-filters-btn').addEventListener('click', function() {
-        currentFilters.searchTerm = document.getElementById('search-term').value;
-        currentFilters.category = document.getElementById('filter-category').value;
-        currentFilters.type = document.getElementById('filter-type').value;
-        currentFilters.dateFrom = document.getElementById('filter-date-from').value;
-        currentFilters.dateTo = document.getElementById('filter-date-to').value;
-        
-        renderTransactions();
-    });
-    
-    // Reset filters button
-    document.getElementById('reset-filters-btn').addEventListener('click', function() {
-        document.getElementById('search-term').value = '';
-        document.getElementById('filter-category').value = '';
-        document.getElementById('filter-type').value = '';
-        
-        const today = new Date().toISOString().split('T')[0];
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
-        
-        document.getElementById('filter-date-from').value = thirtyDaysAgoStr;
-        document.getElementById('filter-date-to').value = today;
-        
-        currentFilters = {
-            searchTerm: '',
-            category: '',
-            type: '',
-            dateFrom: '',
-            dateTo: ''
-        };
-        
-        renderTransactions();
-    });
-    
     // Generate report button
     document.getElementById('generate-report-btn').addEventListener('click', generateReport);
     
-    // When clicking outside the modal, close it
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', toggleTheme);
+    
+    // Report issue link
+    document.getElementById('report-issue-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        openIssueModal();
+    });
+    
+    // Close issue modal button
+    document.querySelector('.close-issue-modal').addEventListener('click', closeIssueModal);
+    
+    // Submit issue button
+    document.getElementById('submit-issue-btn').addEventListener('click', submitIssue);
+    
+    // When clicking outside the modals, close them
     window.addEventListener('click', function(event) {
-        const modal = document.getElementById('edit-modal');
-        if (event.target === modal) {
+        const editModal = document.getElementById('edit-modal');
+        if (event.target === editModal) {
             closeEditModal();
         }
-    });
-};
-
-// Dark mode toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const htmlElement = document.documentElement;
-    
-    // Check for saved theme preference or use default
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    htmlElement.setAttribute('data-theme', savedTheme);
-    updateThemeToggleIcon(savedTheme);
-    
-    // Toggle theme when button is clicked
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         
-        htmlElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeToggleIcon(newTheme);
+        const issueModal = document.getElementById('issue-modal');
+        if (event.target === issueModal) {
+            closeIssueModal();
+        }
     });
-    
-    // Update button icon based on current theme
-    function updateThemeToggleIcon(theme) {
-        themeToggle.innerHTML = theme === 'light' ? '🌕' : '☀️';
-    }
 });
 
 // Show issue modal
@@ -857,28 +869,3 @@ function submitIssue() {
     // Close the modal
     closeIssueModal();
 }
-
-// Add these event listeners inside the window.onload function
-window.addEventListener('DOMContentLoaded', function() {
-    // Existing code...
-    
-    // Report issue link
-    document.getElementById('report-issue-link').addEventListener('click', function(e) {
-        e.preventDefault();
-        openIssueModal();
-    });
-    
-    // Close issue modal button
-    document.querySelector('.close-issue-modal').addEventListener('click', closeIssueModal);
-    
-    // Submit issue button
-    document.getElementById('submit-issue-btn').addEventListener('click', submitIssue);
-    
-    // When clicking outside the issue modal, close it
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('issue-modal');
-        if (event.target === modal) {
-            closeIssueModal();
-        }
-    });
-});
